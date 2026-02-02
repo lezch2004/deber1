@@ -1,0 +1,58 @@
+services:
+  warehouse:
+    image: postgres:13
+    environment:
+      - POSTGRES_USER=root
+      - POSTGRES_PASSWORD=root
+      - POSTGRES_DB=source
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - dm_net
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root -d source"]
+      interval: 1m30s
+      timeout: 5s
+      retries: 3
+      start_period: 5s
+  
+  warehouseui:
+    image: dpage/pgadmin4
+    environment:
+      - PGADMIN_DEFAULT_EMAIL=enaunay@gmail.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+    volumes:
+      - db-ui-data:/var/lib/pgadmin
+    ports:
+      - "8085:80"
+    networks:
+      - dm_net
+    depends_on:
+      warehouse:
+        condition: service_healthy
+    
+  scheduler:
+    image: mageai/mageai
+    volumes:
+      - scheduler-data:/home/src
+    ports:
+      - "6789:6789"
+    command: /app/run_app.sh mage start scheduler
+    networks:
+      - dm_net
+    depends_on:
+      warehouse:
+        condition: service_healthy
+  
+volumes:
+  db-data:
+  db-ui-data:
+  scheduler-data:
+
+networks:
+  dm_net:
+    driver: bridge
+
+  
