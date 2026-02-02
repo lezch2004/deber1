@@ -69,7 +69,17 @@ Proyecto: Deber 1
         Si los resultados son iguales se confirma esto. Evidencia en la carpeta.
 
     8. Troubleshooting
-    
+        El problema más común es el del refresh token. Si es necesario, volver a generarlo en el OAuth Playground. Para problemas con la paginación revisar los logs al ejecutar. Errores de rate limits son mitigados con sleep. Fallos en almacenamiento son vistos con los logs de igual manera, aunque el upsert genera idempotencia. Permisos se pueden revisar en Docker (docker-file).
 
+
+*Mage y Postgres se comunican por nombre de servicio.
+*Todos los secretos (QBO y Postgres) están en Mage Secrets; no hay secretos en el repo/entorno expuesto.
+*Pipelines qb_<entidad>_backfill acepta fecha_inicio y fecha_fin (UTC) y segmenta el rango.
+*Trigger one-time configurado, ejecutado y luego deshabilitado/marcado como completado.
+*Esquema raw con tablas por entidad, payload completo y metadatos obligatorios.
+*Idempotencia verificada: reejecución de un tramo no genera duplicados.
+*Paginación y rate limits manejados y documentados.
+*Volumetría y validaciones mínimas registradas y archivadas como evidencia.
+*Runbook de reanudación y reintentos disponible y seguido.
 
 
